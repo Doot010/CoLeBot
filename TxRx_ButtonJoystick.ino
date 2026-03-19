@@ -21,6 +21,9 @@ int Lena1; // Arduino pin connected to Enable1 of H-Bridge
 int Ldrive1A;// Arduino pin connected to In1 of H-Bridge
 int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
 
+//Stepper Motors
+bool initPos = 1;
+
 // A structure, similar to our servo and stepper motors, but this one conatins variables to be transmitted
 // Any variable you want to transmit/recieve must be initalized in the DataPacket structure
 struct DataPacket {
@@ -179,16 +182,22 @@ void loop() {
     int clawAngle;
     int armAngle;
 
-    if(data.button1 == HIGH){ // close claw
+    if(initPos){
+      Claw.write(10);
+      Arm.write(70);
+      initPos != initPos;
+    }
+
+    if(data.button1 == LOW){ // close claw
       clawAngle--;
     }
-    if(data.button2 == HIGH){ // open claw
+    if(data.button2 == LOW){ // open claw
       clawAngle++;
     }
-    if(data.button3 == HIGH){ // lower arm
+    if(data.button3 == LOW){ // lower arm
       armAngle--;
     }
-    if(data.button4 == HIGH){ // raise arm
+    if(data.button4 == LOW){ // raise arm
       armAngle++;
     }
 
