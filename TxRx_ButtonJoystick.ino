@@ -1,3 +1,5 @@
+//DC MOTOR DOESNT WORK YET
+
 #include "WifiPort2.h"
 #include <Servo.h>
 
