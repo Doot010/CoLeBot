@@ -189,11 +189,11 @@ void loop() {
     }
 
     if(clawAngle <= 45 && clawAngle >= 0){ //claw movement and limits
-      myservo.write(clawAngle);
+      Arm.write(clawAngle);
       delay(15);
     }
     if(armAngle <= 110 && armAngle >= 20){ //arm movement and limits
-      myservo.write(armAngle);
+      Claw.write(armAngle);
       delay(15);
     }
 
