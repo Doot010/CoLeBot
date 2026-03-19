@@ -1,5 +1,3 @@
-//DC MOTOR DOESNT WORK YET
-
 #include "WifiPort2.h"
 #include <Servo.h>
 
@@ -86,8 +84,8 @@ void setup() {
 
     //Right Motor
     Rena1 = 5; // Arduino pin connected to Enable1 of H-Bridge
-    int Rdrive1A = 4; // Arduino pin connected to In1 of H-Bridge
-    int Rdrive2A = 3; // Arduino pin connected to In2 of H-Bridge
+    Rdrive1A = 4; // Arduino pin connected to In1 of H-Bridge
+    Rdrive2A = 3; // Arduino pin connected to In2 of H-Bridge
 
     //Left Motor
     Lena1 = 9; // Arduino pin connected to Enable1 of H-Bridge
@@ -143,17 +141,17 @@ void loop() {
     dataCheck();
 
     //Skid Steering Stuff
-    const int fwdSpeed = (((data.joystickX-512)*2)/1028)*255; //Find proportional value of 1028 as percentage of 255 for analogWrite
-    const int bckSpeed = (((512-data.joystickX)*2)/1028)*255;
+    const int fwdSpeed = map(data.joystickY, 540,1023,0,255); //Find proportional value of 1028 as percentage of 255 for analogWrite
+    const int bckSpeed = map(data.joystickX, 500,0,0,255);
 
-    const int rSpeed = (((data.joystickY-512)*2.0)/1028.0)*255; //Same idea but for turning
-    const int lSpeed = (((512-data.joystickY)*2.0)/1028.0)*255;
+    const int rSpeed = map(data.joystickY, 540,1023,0,255); //Same idea but for turning
+    const int lSpeed = map(data.joystickX, 500,0,0,255);
 
     if(data.joystickX > 540){
       digitalWrite(Rdrive1A, HIGH);  
-      digitalWrite(Rdrive2A, HIGH);
+      digitalWrite(Rdrive2A, LOW);
       digitalWrite(Ldrive1A, HIGH);  
-      digitalWrite(Ldrive2A, HIGH);
+      digitalWrite(Ldrive2A, LOW);
       Serial.println(fwdSpeed);
       analogWrite(Rena1, fwdSpeed);
       analogWrite(Lena1, fwdSpeed);
@@ -168,7 +166,7 @@ void loop() {
     }
     if(data.joystickY > 540){ //Turning Right
       digitalWrite(Rdrive1A, HIGH);  
-      digitalWrite(Rdrive2A, HIGH);
+      digitalWrite(Rdrive2A, LOW);
       digitalWrite(Ldrive1A, LOW);  
       digitalWrite(Ldrive2A, HIGH);
       analogWrite(Rena1, rSpeed);
@@ -178,20 +176,21 @@ void loop() {
       digitalWrite(Rdrive1A, LOW);  
       digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, HIGH);  
-      digitalWrite(Ldrive2A, HIGH);
+      digitalWrite(Ldrive2A, LOW);
       analogWrite(Rena1, lSpeed);
       analogWrite(Lena1, lSpeed);
+    }
+    else { //No movement when joystick centered
+      digitalWrite(Rdrive1A, LOW);  
+      digitalWrite(Rdrive2A, LOW);
+      digitalWrite(Ldrive1A, LOW);  
+      digitalWrite(Ldrive2A, LOW);
+      analogWrite(Rena1, 0);
+      analogWrite(Lena1, 0);
     }
 
 
     //Stepper Control
-
-    //if(initPos){
-      //Claw.write(10);
-      //Arm.write(70);
-      //initPos = !initPos;
-    //}
-
     if(data.button1 == LOW){ // close claw
       clawAngle--;
     }
