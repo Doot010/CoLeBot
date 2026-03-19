@@ -1,7 +1,24 @@
 #include "WifiPort2.h"
 
+//TX VARIABLES
+int b1Pin;
+int b2Pin;
+int b3Pin;
+int b4Pin;
+int JPin;
+int XPin;
+int YPin;
 
+//RX VARIABLES
+//Right Motor
+int Rena1; // Arduino pin connected to Enable1 of H-Bridge
+int Rdrive1A;// Arduino pin connected to In1 of H-Bridge
+int Rdrive2A;// Arduino pin connected to In2 of H-Bridge
 
+//Left Motor
+int Lena1; // Arduino pin connected to Enable1 of H-Bridge
+int Ldrive1A;// Arduino pin connected to In1 of H-Bridge
+int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
 // A structure, similar to our servo and stepper motors, but this one conatins variables to be transmitted
 // Any variable you want to transmit/recieve must be initalized in the DataPacket structure
 struct DataPacket {
@@ -14,22 +31,6 @@ struct DataPacket {
   int joystickX;
   int joystickY;  
   int joystickButton;                //YOU should wire up a simple resistor (220 ohm) circuit and manually probe it with a wire connected to A0
-
-  //TRANSMITTER BOARD PINS
-  int b1Pin = 3;
-  int b2Pin = 4;
-  int b3Pin = 5;
-  int b4Pin = 6;
-  int JPin = 2;
-  int XPin = A0;
-  int YPin = A1;
-
-  //RECIEVER BOARD
-  //
-  const int ena1 = 5; // Arduino pin connected to Enable1 of H-Bridge
-  const int drive1A = 4; // Arduino pin connected to In1 of H-Bridge
-  const int drive2A = 3; // Arduino pin connected to In2 of H-Bridge
-
 
 };
 
@@ -53,13 +54,13 @@ void setup() {
 
   //Set Up for tx and rx
   if (WifiSerial.getPortType() == WifiPortType::Transmitter || WifiSerial.getPortType() == WifiPortType::Emulator){
-    int b1Pin = 3;
-    int b2Pin = 4;
-    int b3Pin = 5;
-    int b4Pin = 6;
-    int JPin = 2;
-    int XPin = A0;
-    int YPin = A1;
+    b1Pin = 3;
+    b2Pin = 4;
+    b3Pin = 5;
+    b4Pin = 6;
+    JPin = 2;
+    XPin = A0;
+    YPin = A1;
     pinMode(3,INPUT_PULLUP);//Button1
     pinMode(4,INPUT_PULLUP);//Button2
     pinMode(5,INPUT_PULLUP);//Button3
@@ -73,14 +74,14 @@ void setup() {
     //RECIEVER BOARD
 
     //Right Motor
-    const int Rena1 = 5; // Arduino pin connected to Enable1 of H-Bridge
-    const int Rdrive1A = 4; // Arduino pin connected to In1 of H-Bridge
-    const int Rdrive2A = 3; // Arduino pin connected to In2 of H-Bridge
+    Rena1 = 5; // Arduino pin connected to Enable1 of H-Bridge
+    int Rdrive1A = 4; // Arduino pin connected to In1 of H-Bridge
+    int Rdrive2A = 3; // Arduino pin connected to In2 of H-Bridge
 
     //Left Motor
-    const int Lena1 = 9; // Arduino pin connected to Enable1 of H-Bridge
-    const int Ldrive1A = 8; // Arduino pin connected to In1 of H-Bridge
-    const int Ldrive2A = 6; // Arduino pin connected to In2 of H-Bridge
+    Lena1 = 9; // Arduino pin connected to Enable1 of H-Bridge
+    Ldrive1A = 8; // Arduino pin connected to In1 of H-Bridge
+    Ldrive2A = 6; // Arduino pin connected to In2 of H-Bridge
 
     //Pin Moding it
     pinMode(Rena1,OUTPUT);
@@ -128,8 +129,43 @@ void loop() {
     //dataCheck(); 
 
     //Skid Steering Stuff
-    if(drive > 540 && drive < 500){
-      
+    const int fwdSpeed = (((data.joystickX-512)*2)/1028)*255; //Find proportional value of 1028 as percentage of 255 for analogWrite
+    const int bckSpeed = (((512-data.joystickX)*2)/1028)*255;
+
+    const int rSpeed = (((data.joystickY-512)*2)/1028)*255; //Same idea but for turning
+    const int lSpeed = (((512-data.joystickY)*2)/1028)*255;
+
+    if(data.joystickX > 540){
+      digitalWrite(Rdrive1A, HIGH);  
+      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Ldrive1A, HIGH);  
+      digitalWrite(Ldrive2A, HIGH); 
+      analogWrite(Rena1, fwdSpeed);
+      analogWrite(Lena1, fwdSpeed);
+    }
+    if(data.joystickX < 500){
+      digitalWrite(Rdrive1A, LOW);  
+      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Ldrive1A, LOW);  
+      digitalWrite(Ldrive2A, HIGH); 
+      analogWrite(Rena1, bckSpeed);
+      analogWrite(Lena1, bckSpeed);
+    }
+    if(data.joystickY > 540){ //Turning Right
+      digitalWrite(Rdrive1A, HIGH);  
+      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Ldrive1A, LOW);  
+      digitalWrite(Ldrive2A, HIGH); 
+      analogWrite(Rena1, rSpeed);
+      analogWrite(Lena1, rSpeed);
+    }
+    if(data.joystickY < 500){ //Turning Left
+      digitalWrite(Rdrive1A, LOW);  
+      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Ldrive1A, HIGH);  
+      digitalWrite(Ldrive2A, HIGH); 
+      analogWrite(Rena1, lSpeed);
+      analogWrite(Lena1, lSpeed);
     }
     //all RX stuff above
 
