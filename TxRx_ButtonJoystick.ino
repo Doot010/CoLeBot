@@ -1,4 +1,5 @@
 #include "WifiPort2.h"
+#include <Servo.h>
 
 //TX VARIABLES
 int b1Pin;
@@ -19,6 +20,7 @@ int Rdrive2A;// Arduino pin connected to In2 of H-Bridge
 int Lena1; // Arduino pin connected to Enable1 of H-Bridge
 int Ldrive1A;// Arduino pin connected to In1 of H-Bridge
 int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
+
 // A structure, similar to our servo and stepper motors, but this one conatins variables to be transmitted
 // Any variable you want to transmit/recieve must be initalized in the DataPacket structure
 struct DataPacket {
@@ -170,8 +172,10 @@ void loop() {
 
 
     //Stepper Control
-    servo Claw;
-    servo Arm;
+    Servo Claw;
+    Claw.attach(1);
+    Servo Arm;
+    Arm.attach(2);
     int clawAngle;
     int armAngle;
 
@@ -189,11 +193,11 @@ void loop() {
     }
 
     if(clawAngle <= 45 && clawAngle >= 0){ //claw movement and limits
-      Arm.write(clawAngle);
+      Claw.write(clawAngle);
       delay(15);
     }
     if(armAngle <= 110 && armAngle >= 20){ //arm movement and limits
-      Claw.write(armAngle);
+      Arm.write(armAngle);
       delay(15);
     }
 
