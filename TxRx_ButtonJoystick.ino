@@ -167,6 +167,38 @@ void loop() {
       analogWrite(Rena1, lSpeed);
       analogWrite(Lena1, lSpeed);
     }
+
+
+    //Stepper Control
+    servo Claw;
+    servo Arm;
+    int clawAngle;
+    int armAngle;
+
+    if(data.button1 == HIGH){ // close claw
+      clawAngle--;
+    }
+    if(data.button2 == HIGH){ // open claw
+      clawAngle++;
+    }
+    if(data.button3 == HIGH){ // lower arm
+      armAngle--;
+    }
+    if(data.button4 == HIGH){ // raise arm
+      armAngle++;
+    }
+
+    if(clawAngle <= 45 && clawAngle >= 0){ //claw movement and limits
+      myservo.write(clawAngle);
+      delay(15);
+    }
+    if(armAngle <= 110 && armAngle >= 20){ //arm movement and limits
+      myservo.write(armAngle);
+      delay(15);
+    }
+
+      //gripper range: 0-45, 10 is safe start - must make manually
+      //arm range: 20-110, 70 is safe start - must make manually
     //all RX stuff above
 
   }
