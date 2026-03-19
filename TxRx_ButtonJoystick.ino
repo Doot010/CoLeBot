@@ -23,6 +23,10 @@ int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
 
 //Stepper Motors
 bool initPos = 1;
+int clawAngle = 10;
+int armAngle = 70;
+Servo Claw;
+Servo Arm;
 
 // A structure, similar to our servo and stepper motors, but this one conatins variables to be transmitted
 // Any variable you want to transmit/recieve must be initalized in the DataPacket structure
@@ -52,8 +56,8 @@ void setup() {
   //you need to update in your serial monitor
 
   //WifiSerial.begin("PairAP_CBGA41", "triplesr", WifiPortType::Transmitter);
-  //WifiSerial.begin("PairAP_CBGA41", "triplesr", WifiPortType::Receiver);
-  WifiSerial.begin("PairAP_CBGA41", "triplesr", WifiPortType::Emulator); // one board to rule them all debugging
+  WifiSerial.begin("PairAP_CBGA41", "triplesr", WifiPortType::Receiver);
+  //WifiSerial.begin("PairAP_CBGA41", "triplesr", WifiPortType::Emulator); // one board to rule them all debugging
   //meant to emulate both your controller and colebot on a single R3
   //8 Character, no special characters, no spaces password
 
@@ -88,6 +92,9 @@ void setup() {
     Ldrive1A = 8; // Arduino pin connected to In1 of H-Bridge
     Ldrive2A = 6; // Arduino pin connected to In2 of H-Bridge
 
+    Claw.attach(11);
+    Arm.attach(7);
+
     //Pin Moding it
     pinMode(Rena1,OUTPUT);
     pinMode(Rdrive1A,OUTPUT);
@@ -98,7 +105,7 @@ void setup() {
   }
 }
 
-  
+ 
 
 
 void loop() {
@@ -125,68 +132,63 @@ void loop() {
   }
 
 
-  
+ 
   if ((WifiSerial.getPortType() == WifiPortType::Receiver || WifiSerial.getPortType() == WifiPortType::Emulator) && WifiSerial.checkForData()) {
 
     data = WifiSerial.getData();//received and unpack data structure
 
     //all Rx stuff below
-    //dataCheck(); 
+    dataCheck();
 
     //Skid Steering Stuff
     const int fwdSpeed = (((data.joystickX-512)*2)/1028)*255; //Find proportional value of 1028 as percentage of 255 for analogWrite
     const int bckSpeed = (((512-data.joystickX)*2)/1028)*255;
 
-    const int rSpeed = (((data.joystickY-512)*2)/1028)*255; //Same idea but for turning
-    const int lSpeed = (((512-data.joystickY)*2)/1028)*255;
+    const int rSpeed = (((data.joystickY-512)*2.0)/1028.0)*255; //Same idea but for turning
+    const int lSpeed = (((512-data.joystickY)*2.0)/1028.0)*255;
 
     if(data.joystickX > 540){
       digitalWrite(Rdrive1A, HIGH);  
-      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, HIGH);  
-      digitalWrite(Ldrive2A, HIGH); 
+      digitalWrite(Ldrive2A, HIGH);
+      Serial.println(fwdSpeed);
       analogWrite(Rena1, fwdSpeed);
       analogWrite(Lena1, fwdSpeed);
     }
     if(data.joystickX < 500){
       digitalWrite(Rdrive1A, LOW);  
-      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, LOW);  
-      digitalWrite(Ldrive2A, HIGH); 
+      digitalWrite(Ldrive2A, HIGH);
       analogWrite(Rena1, bckSpeed);
       analogWrite(Lena1, bckSpeed);
     }
     if(data.joystickY > 540){ //Turning Right
       digitalWrite(Rdrive1A, HIGH);  
-      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, LOW);  
-      digitalWrite(Ldrive2A, HIGH); 
+      digitalWrite(Ldrive2A, HIGH);
       analogWrite(Rena1, rSpeed);
       analogWrite(Lena1, rSpeed);
     }
     if(data.joystickY < 500){ //Turning Left
       digitalWrite(Rdrive1A, LOW);  
-      digitalWrite(Rdrive2A, HIGH); 
+      digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, HIGH);  
-      digitalWrite(Ldrive2A, HIGH); 
+      digitalWrite(Ldrive2A, HIGH);
       analogWrite(Rena1, lSpeed);
       analogWrite(Lena1, lSpeed);
     }
 
 
     //Stepper Control
-    Servo Claw;
-    Claw.attach(1);
-    Servo Arm;
-    Arm.attach(2);
-    int clawAngle;
-    int armAngle;
 
-    if(initPos){
-      Claw.write(10);
-      Arm.write(70);
-      initPos != initPos;
-    }
+    //if(initPos){
+      //Claw.write(10);
+      //Arm.write(70);
+      //initPos = !initPos;
+    //}
 
     if(data.button1 == LOW){ // close claw
       clawAngle--;
@@ -199,6 +201,8 @@ void loop() {
     }
     if(data.button4 == LOW){ // raise arm
       armAngle++;
+      Serial.println("a");
+      Serial.println(armAngle);
     }
 
     if(clawAngle <= 45 && clawAngle >= 0){ //claw movement and limits
@@ -207,6 +211,7 @@ void loop() {
     }
     if(armAngle <= 110 && armAngle >= 20){ //arm movement and limits
       Arm.write(armAngle);
+      Serial.println("b");
       delay(15);
     }
 
@@ -235,7 +240,6 @@ void dataCheck(){
   Serial.print( "  Joystick Y: " );
   Serial.print(data.joystickY);
   Serial.print( "  Joystick Button: " );
-  Serial.println(data.joystickButton); 
-  Serial.println(""); 
+  Serial.println(data.joystickButton);
+  Serial.println("");
 }
-
