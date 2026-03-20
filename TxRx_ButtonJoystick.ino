@@ -25,6 +25,8 @@ int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
 bool initPos = 1;
 int clawAngle = 10;
 int armAngle = 70;
+int clawChange = clawAngle;
+int armChange = armAngle;
 Servo Claw;
 Servo Arm;
 
@@ -68,8 +70,8 @@ void setup() {
     b3Pin = 5;
     b4Pin = 6;
     JPin = 2;
-    XPin = A0;
-    YPin = A1;
+    XPin = A1;
+    YPin = A0;
     pinMode(3,INPUT_PULLUP);//Button1
     pinMode(4,INPUT_PULLUP);//Button2
     pinMode(5,INPUT_PULLUP);//Button3
@@ -141,11 +143,11 @@ void loop() {
     dataCheck();
 
     //Skid Steering Stuff
-    const int fwdSpeed = map(data.joystickY, 540,1023,0,255); //Find proportional value of 1028 as percentage of 255 for analogWrite
-    const int bckSpeed = map(data.joystickX, 500,0,0,255);
+    const int fwdSpeed = map(data.joystickX, 540,1023,0,255); //Find proportional value of 1028 as percentage of 255 for analogWrite
+    const int bckSpeed = map(data.joystickX, 480,0,0,255);
 
     const int rSpeed = map(data.joystickY, 540,1023,0,255); //Same idea but for turning
-    const int lSpeed = map(data.joystickX, 500,0,0,255);
+    const int lSpeed = map(data.joystickY, 480,0,0,255);
 
     if(data.joystickX > 540){
       digitalWrite(Rdrive1A, HIGH);  
@@ -156,7 +158,7 @@ void loop() {
       analogWrite(Rena1, fwdSpeed);
       analogWrite(Lena1, fwdSpeed);
     }
-    if(data.joystickX < 500){
+    else if (data.joystickX < 480){
       digitalWrite(Rdrive1A, LOW);  
       digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, LOW);  
@@ -164,7 +166,7 @@ void loop() {
       analogWrite(Rena1, bckSpeed);
       analogWrite(Lena1, bckSpeed);
     }
-    if(data.joystickY > 540){ //Turning Right
+    else if (data.joystickY > 540){ //Turning Right
       digitalWrite(Rdrive1A, HIGH);  
       digitalWrite(Rdrive2A, LOW);
       digitalWrite(Ldrive1A, LOW);  
@@ -172,7 +174,7 @@ void loop() {
       analogWrite(Rena1, rSpeed);
       analogWrite(Lena1, rSpeed);
     }
-    if(data.joystickY < 500){ //Turning Left
+    else if (data.joystickY < 480){ //Turning Left
       digitalWrite(Rdrive1A, LOW);  
       digitalWrite(Rdrive2A, HIGH);
       digitalWrite(Ldrive1A, HIGH);  
@@ -192,27 +194,27 @@ void loop() {
 
     //Stepper Control
     if(data.button1 == LOW){ // close claw
-      clawAngle--;
+      clawAngle = clawAngle -5;
     }
     if(data.button2 == LOW){ // open claw
-      clawAngle++;
+      clawAngle = clawAngle + 5;
     }
     if(data.button3 == LOW){ // lower arm
-      armAngle--;
+      armAngle = armAngle - 5;
     }
     if(data.button4 == LOW){ // raise arm
-      armAngle++;
-      Serial.println("a");
+      armAngle = armAngle + 5;
       Serial.println(armAngle);
     }
 
-    if(clawAngle <= 45 && clawAngle >= 0){ //claw movement and limits
+    if(clawAngle <= 45 && clawAngle >= 0 && clawAngle != clawChange){ //claw movement and limits
       Claw.write(clawAngle);
+      clawChange = clawAngle;
       delay(15);
     }
-    if(armAngle <= 110 && armAngle >= 20){ //arm movement and limits
+    if(armAngle <= 110 && armAngle >= 20 && armAngle != armChange){ //arm movement and limits
       Arm.write(armAngle);
-      Serial.println("b");
+      armChange = armAngle;
       delay(15);
     }
 
