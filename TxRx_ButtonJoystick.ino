@@ -1,3 +1,4 @@
+
 #include "WifiPort2.h"
 #include <Servo.h>
 
@@ -23,7 +24,7 @@ int Ldrive2A; // Arduino pin connected to In2 of H-Bridge
 
 //Stepper Motors
 bool initPos = 1;
-int clawAngle = 10;
+int clawAngle = 20;
 int armAngle = 70;
 int clawChange = clawAngle;
 int armChange = armAngle;
@@ -85,17 +86,17 @@ void setup() {
     //RECIEVER BOARD
 
     //Right Motor
-    Rena1 = 5; // Arduino pin connected to Enable1 of H-Bridge
-    Rdrive1A = 4; // Arduino pin connected to In1 of H-Bridge
-    Rdrive2A = 3; // Arduino pin connected to In2 of H-Bridge
+    Rena1 = 3; // Arduino pin connected to Enable1 of H-Bridge
+    Rdrive1A = 2; // Arduino pin connected to In1 of H-Bridge
+    Rdrive2A = 4; // Arduino pin connected to In2 of H-Bridge
 
     //Left Motor
-    Lena1 = 9; // Arduino pin connected to Enable1 of H-Bridge
-    Ldrive1A = 8; // Arduino pin connected to In1 of H-Bridge
-    Ldrive2A = 6; // Arduino pin connected to In2 of H-Bridge
+    Lena1 = 6; // Arduino pin connected to Enable1 of H-Bridge
+    Ldrive1A = 5; // Arduino pin connected to In1 of H-Bridge
+    Ldrive2A = 7; // Arduino pin connected to In2 of H-Bridge
 
-    Claw.attach(11);
-    Arm.attach(7);
+    Claw.attach(A1);
+    Arm.attach(A0);
 
     //Pin Moding it
     pinMode(Rena1,OUTPUT);
@@ -207,12 +208,12 @@ void loop() {
       Serial.println(armAngle);
     }
 
-    if(clawAngle <= 45 && clawAngle >= 0 && clawAngle != clawChange){ //claw movement and limits
+    if(clawAngle <= 52 && clawAngle >= 10 && clawAngle != clawChange){ //claw movement and limits
       Claw.write(clawAngle);
       clawChange = clawAngle;
       delay(15);
     }
-    if(armAngle <= 110 && armAngle >= 20 && armAngle != armChange){ //arm movement and limits
+    if(armAngle <= 125 && armAngle >= 50 && armAngle != armChange){ //arm movement and limits
       Arm.write(armAngle);
       armChange = armAngle;
       delay(15);
