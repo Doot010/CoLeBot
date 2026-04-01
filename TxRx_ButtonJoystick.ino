@@ -73,13 +73,13 @@ void setup() {
     JPin = 2;
     XPin = A1;
     YPin = A0;
-    pinMode(3,INPUT_PULLUP);//Button1
-    pinMode(4,INPUT_PULLUP);//Button2
-    pinMode(5,INPUT_PULLUP);//Button3
-    pinMode(6,INPUT_PULLUP);//Button4
-    pinMode(A0, INPUT);//JoystickX
-    pinMode(A1, INPUT);//JoystickY
-    pinMode(2,INPUT_PULLUP);//JoystickButton
+    pinMode(b1Pin,INPUT_PULLUP);//Button1
+    pinMode(b2Pin,INPUT_PULLUP);//Button2
+    pinMode(b3Pin,INPUT_PULLUP);//Button3
+    pinMode(b4Pin,INPUT_PULLUP);//Button4
+    pinMode(XPin, INPUT);//JoystickX
+    pinMode(Ypin, INPUT);//JoystickY
+    pinMode(JPin,INPUT_PULLUP);//JoystickButton
   }
 
   if ((WifiSerial.getPortType() == WifiPortType::Receiver || WifiSerial.getPortType() == WifiPortType::Emulator)){
@@ -208,12 +208,14 @@ void loop() {
       Serial.println(armAngle);
     }
 
-    if(clawAngle <= 52 && clawAngle >= 10 && clawAngle != clawChange){ //claw movement and limits
+    clawAngle = constrain(clawAngle, 10, 52); //beautiful constraint functions
+    armAngle = constrain(armAngle, 50, 125);
+    if(clawAngle != clawChange){ //claw movement and limits
       Claw.write(clawAngle);
       clawChange = clawAngle;
       delay(15);
     }
-    if(armAngle <= 125 && armAngle >= 50 && armAngle != armChange){ //arm movement and limits
+    if(armAngle != armChange){ //arm movement and limits
       Arm.write(armAngle);
       armChange = armAngle;
       delay(15);
