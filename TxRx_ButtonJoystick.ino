@@ -125,55 +125,31 @@ void setup() {
 
 
   if ((WifiSerial.getPortType() == WifiPortType::Receiver || WifiSerial.getPortType() == WifiPortType::Emulator)){
-
     //RECIEVER BOARD
 
-
     //Right Motor
-
     Rena1 = 3; // Arduino pin connected to Enable1 of H-Bridge
-
     Rdrive1A = 2; // Arduino pin connected to In1 of H-Bridge
-
     Rdrive2A = 4; // Arduino pin connected to In2 of H-Bridge
 
-
     //Left Motor
-
     Lena1 = 6; // Arduino pin connected to Enable1 of H-Bridge
-
     Ldrive1A = 5; // Arduino pin connected to In1 of H-Bridge
-
     Ldrive2A = 7; // Arduino pin connected to In2 of H-Bridge
 
-
     Claw.attach(A1);
-
     Arm.attach(A0);
 
     Claw.write(clawAngle);
-
     Arm.write(armAngle);
-
-    delay(100);
-
-
     //Pin Moding it
-
     pinMode(Rena1,OUTPUT);
-
     pinMode(Rdrive1A,OUTPUT);
-
     pinMode(Rdrive2A,OUTPUT);
-
     pinMode(Lena1,OUTPUT); // set digital pin modes to output
-
     pinMode(Ldrive1A,OUTPUT);
-
     pinMode(Ldrive2A,OUTPUT);
-
   }
-
 }
 
 
@@ -334,7 +310,6 @@ void loop() {
       //arm range: 20-110, 70 is safe start - must make manually
     //all RX stuff above
   }
-  delay(10); // update delay after you get it working to be a smaller number like 10ms to account for WiFi transmission overhead
 }
 
 void dataCheck(){
